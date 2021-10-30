@@ -32,4 +32,34 @@ function createArticle(request, response) {
     )
 }
 
-module.exports = {getArticles, createArticle}
+function deleteArticle(request, response) {
+    const id = request.params.id
+    connection.query(
+        "DELETE FROM articles WHERE id = ?",
+        [id],
+        function (err, result) {
+            if (!err) {
+                response.json({
+                    data: result,
+                    status: 'Sucess'
+                })
+            }
+        }
+    )
+}
+
+function getArticlesbyid(request, response) {
+    const id = request.params.id
+    connection.query(
+        "SELECT * FROM articles WHERE id = ?",
+        [id],
+        function (err, result, field) {
+            response.json({
+                data: result,
+                status: 'Sucess'
+            })
+        }
+    )
+}
+
+module.exports = {getArticles, createArticle, deleteArticle, getArticlesbyid}

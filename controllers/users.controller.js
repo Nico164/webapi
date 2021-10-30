@@ -1,5 +1,6 @@
 const { connection } = require("./config/db")
 const bcrypt = require('bcrypt')
+const { json } = require("express")
 
 function getUsers(request, response) {
     connection.query(
@@ -46,6 +47,54 @@ function registerUsers(request, response) {
     )
 }
 
+function loginUsers(request, response) {
+    const email = request.body.email
+    const password = request.body.password
+    connection.query(
+        "Select * from users where email=?",
+        [email],
+        function (err, result) {
+            if (!err) {
+                if (result.lenght <= 0) {
+                    json.response({
+                        data: null,
+                        status: "file",
+                        message: "email salah"
+                    })
+                } else {
+                    const dbpassword = result?.[0]?.password
+                    console.log (bcrypt.compareSync(password, dbpassword))
+                    if (result.lenght > 0) {
+                        if (bcrypt.compareSync(password, dbpassword)){
+                            response.json({
+                                data: result,
+                                status: 'Sucess'
+                            })
+                        }
+                       
+
+                    } else {
+                        response.json({
+                            data: null,
+                            status: 'failed',
+                            message: "password salah"
+                        })
+
+                    }
+                }
+
+
+            } else {
+                response.json({
+                    data: null,
+                    status: 'failed',
+                    message: "email salah"
+                })
+            }
+        }
+    )
+}
+
 function deleteUser(request, response) {
     const id = request.params.id
     connection.query(
@@ -63,5 +112,5 @@ function deleteUser(request, response) {
 }
 
 module.exports = {
-    getUsers, getUserbyid, registerUsers, deleteUser
+    getUsers, getUserbyid, registerUsers, deleteUser, loginUsers
 }
